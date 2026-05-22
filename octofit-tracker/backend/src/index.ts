@@ -13,7 +13,7 @@ app.use(cors());
 app.use(express.json());
 
 // MongoDB connection
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/octofit-tracker';
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/octofit_db';
 
 mongoose
   .connect(MONGODB_URI)
@@ -24,16 +24,29 @@ mongoose
     console.error('MongoDB connection error:', error);
   });
 
+// Base URL logic for Codespaces
+const codespaceName = process.env.CODESPACE_NAME;
+const baseUrl = codespaceName
+  ? `https://${codespaceName}-8000.app.github.dev`
+  : 'http://localhost:8000';
+
 // Routes
 app.get('/', (req: Request, res: Response) => {
-  res.json({ message: 'OctoFit Tracker API' });
+  res.json({ 
+    message: 'OctoFit Tracker API',
+    baseUrl 
+  });
 });
 
-app.get('/health', (req: Request, res: Response) => {
-  res.json({ status: 'OK', timestamp: new Date().toISOString() });
+app.get('/api/health', (req: Request, res: Response) => {
+  res.json({ 
+    status: 'OK', 
+    timestamp: new Date().toISOString(),
+    baseUrl
+  });
 });
 
 // Start server
 app.listen(port, () => {
-  console.log(`⚡️[server]: Server is running at http://localhost:${port}`);
+  console.log(`⚡️[server]: Server is running at ${baseUrl}`);
 });
